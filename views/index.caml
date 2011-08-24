@@ -15,12 +15,17 @@ Your Perl Résumé generated automatically based on your <a
 <table>
     <tr>
         <td>
+            {{^authors}}
             <a href="/MIYAGAWA">Tatsuhiko Miyagawa</a><br />
             <a href="/BDFOY">brian d foy</a><br />
             <a href="/MSTROUT">Matt S Trout</a><br />
             <a href="/SUKRIA">Alexis Sukrieh</a><br />
             <a href="/XSAWYERX">Sawyer X</a><br />
             <a href="/MLEHMANN">Marc Lehmann</a><br />
+            {{/authors}}
+            {{#authors}}
+            <a href="/{{pauseid}}">{{name}}</a><br />
+            {{/authors}}
         </td>
     </tr>
 </table>

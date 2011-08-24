@@ -15,7 +15,20 @@ get '/' => sub {
         return redirect '/' . $author;
     }
 
-    template 'index';
+    my $authors;
+    if (-e path('searches')) {
+        open my $fh, '<', path('searches') or die $!;
+        while (defined(my $line = <$fh>)) {
+            chomp $line;
+            my ($id, $name) = split ':' => $line;
+            push @$authors, {id => $id, name => $name};
+        }
+        close $fh;
+
+        $authors = [reverse @$authors];
+    }
+
+    template 'index' => {authors => $authors};
 };
 
 get '/:author' => sub {
@@ -27,6 +40,12 @@ get '/:author' => sub {
         status 'not_found';
         return template 'not_found';
     }
+
+    my $name = $author->{asciiname} ? $author->{asciiname} : $author->{name};
+
+    open my $fh, '>>', path('searches');
+    print $fh "$id:$name", "\n" or die $!;
+    close $fh;
 
     $author->{dist_count} = fetch_dist_count($id);
 
