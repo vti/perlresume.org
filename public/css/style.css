@@ -8,6 +8,7 @@
 }
 
 #footer {
+    text-align:right;
     border-top:1px solid #ccc;
     font-size:small;
     margin-top:2em;
@@ -16,7 +17,7 @@
 }
 
 #resume-banner {
-    padding-top:2em;
+    margin-top:2em;
     border-top: 5px solid #ccc;
 }
 
@@ -38,11 +39,11 @@ h3#proud {
 }
 
 #resume tr {
-    background:#eee;
 }
 
 #resume td {
-    padding:1em;
+    padding-top:2em;
+    padding-right:2em;
     vertical-align:top;
 }
 

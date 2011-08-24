@@ -15,7 +15,7 @@
             </td>
         </tr>
         <tr>
-            <td class="title">CPAN profile</td>
+            <td class="title">Profile</td>
             <td class="desription">
                 I am yet another proud Perl programmer {{#city}}based in
                 {{city}}{{/city}} with <a
@@ -25,7 +25,7 @@
                     href="{{website}}">{{website}}</a>.{{/website}}
             </td>
         </tr>
-        {{#dist_users_count}}
+        {{#dists_users_count}}
         <tr>
             <td class="title">Impact</td>
             <td class="description">
@@ -33,7 +33,7 @@
                 were favorited {{favorited_dist_count}} times{{/favorited_dist_count}}.
             </td>
         </tr>
-        {{/dist_users_count}}
+        {{/dists_users_count}}
         <tr>
             <td class="title">Activity</td>
             <td class="description">

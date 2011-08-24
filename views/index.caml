@@ -13,3 +13,8 @@ Your Perl Résumé generated automatically based on your <a
 <h2>See some popular authors</h2>
 
 <h2>Notes</h2>
+
+<p>
+All the data is fetched from an awesome <a
+    href="http://metacpan.org">MetaCPAN</a>.
+</p>

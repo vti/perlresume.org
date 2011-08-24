@@ -170,8 +170,7 @@ sub fetch_dists_users_count {
                 }
             },
             size => 0,
-            from => 0,
-            #sort => [{date => 'desc'}],
+            #,from => 0
         }
     );
 
