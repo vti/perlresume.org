@@ -36,3 +36,35 @@ Your Perl Résumé is generated automatically based on your <a
 All the data is fetched from the awesome <a
     href="http://metacpan.org">MetaCPAN</a>.
 </p>
+
+<a id="showcomments" href="/?comments">Show comments</a>
+
+<div id="comments">
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#showcomments').click(function() {
+            $('#showcomments').hide();
+
+            $('#comments').append(
+    '<h2>Comments</h2>'
+    + '<div id="disqus_thread"></div>'
+    + '<script type="text/javascript">'
+    + "    var disqus_shortname = 'perlresume';"
+    + "    var disqus_identifier = 'perlresume';"
+    + "    var disqus_url = 'http://perlresume.org';"
+    + '    (function() {'
+    + "        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;"
+    + "        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';"
+    + "        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);"
+    + '    })();'
+    + '<\/script>'
+    + '<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>'
+    + '<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>'
+            );
+
+            return false;
+        });
+    });
+</script>
