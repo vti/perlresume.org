@@ -29,7 +29,7 @@
         <tr>
             <td class="title">Impact</td>
             <td class="description">
-                My modules are used by other {{dists_users_count}} distributions{{#favorited_dist_count}} and
+                My modules are used by {{dists_users_count}} other distributions{{#favorited_dist_count}} and
                 were favorited {{favorited_dist_count}} times{{/favorited_dist_count}}.
             </td>
         </tr>
