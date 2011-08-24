@@ -3,8 +3,12 @@ use Dancer ':syntax';
 use MetaCPAN::API;
 use Try::Tiny;
 use Time::Piece;
+use LWP::UserAgent;
+use JSON ();
 
 our $VERSION = '0.1';
+
+my $METACPAN = 'http://api.metacpan.org/v0';
 
 get '/' => sub {
     if (my $author = params->{author}) {
@@ -42,7 +46,12 @@ get '/:author' => sub {
     $author->{first_release_year} = fetch_first_release_year($id);
     $author->{favorited_dist_count} = fetch_favorited_dist_count($id);
 
-    template 'resume' => $author;
+    $author->{dists_users_count} = fetch_dists_users_count($id);
+
+    template 'resume' => {
+        %$author,
+        title => $author->{asciiname} ? $author->{asciiname} : $author->{name}
+    };
 };
 
 true;
@@ -96,8 +105,77 @@ sub fetch_first_release_year {
     );
 
     my $date = $result->{hits}->{hits}->[0]->{_source}->{date};
+    return 0 unless defined $date;
 
     $date = Time::Piece->strptime($date, '%Y-%m-%dT%H:%M:%S');
 
     return $date->year;
+}
+
+sub fetch_dists_users_count {
+    my ($id) = @_;
+
+    my $ua = LWP::UserAgent->new;
+
+    my $response = $ua->post(
+        "$METACPAN/release/_search",
+        Content => JSON::encode_json(
+            {   query => {
+                    filtered => {
+                        query  => {"match_all" => {}},
+                        filter => {
+                            and => [
+                                {term => {'release.status'     => 'latest'}},
+                                {term => {'release.authorized' => \1}},
+                                {term => {"release.author"     => $id}}
+                            ]
+                        }
+                    }
+                },
+                fields => ['distribution'],
+                size => 999,
+                from => 0,
+                sort => [{date => 'desc'}],
+            }
+        )
+    );
+    die $response->status_line unless $response->is_success;
+
+    my $res = JSON::decode_json($response->decoded_content);
+
+    my @modules;
+    foreach my $module (@{$res->{hits}{hits}}) {
+        my $name = $module->{fields}{distribution};
+        $name =~ s/-/::/g;
+        push @modules, $name;
+    }
+
+    $response = $ua->post(
+        "$METACPAN/release/_search",
+        Content => JSON::encode_json {
+            query => {
+                filtered => {
+                    query  => {"match_all" => {}},
+                    filter => {
+                        and => [
+                            {term => {'release.status'     => 'latest'}},
+                            {term => {'release.authorized' => \1}},
+                            {   terms =>
+                                  {"release.dependency.module" => \@modules}
+                            }
+                        ]
+                    }
+                }
+            },
+            size => 0,
+            from => 0,
+            #sort => [{date => 'desc'}],
+        }
+    );
+
+    die $response->status_line unless $response->is_success;
+
+    $res = JSON::decode_json($response->decoded_content);
+
+    return $res->{hits}->{total};
 }

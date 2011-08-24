@@ -47,6 +47,7 @@ h3#proud {
 }
 
 #resume td.title {
+    text-align:right;
     font-style:italic;
 }
 
