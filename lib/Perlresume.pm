@@ -12,7 +12,7 @@ my $METACPAN = 'http://api.metacpan.org/v0';
 
 get '/' => sub {
     if (my $author = params->{author}) {
-        redirect '/' . $author;
+        return redirect '/' . $author;
     }
 
     template 'index';
