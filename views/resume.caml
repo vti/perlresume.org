@@ -37,7 +37,7 @@
         <tr>
             <td class="title">Activity</td>
             <td class="description">
-                <img src="https://metacpan.org/activity?res=month&author={{pauseid}}VTI" />
+                <img src="https://metacpan.org/activity?res=month&author={{pauseid}}" />
                 <div><small class="comment">24 month</small></div>
             </td>
         </tr>
