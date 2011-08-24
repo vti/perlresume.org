@@ -38,6 +38,10 @@ h3#proud {
     font-style:italic;
 }
 
+td {
+    vertical-align:top;
+}
+
 #resume tr {
 }
 
