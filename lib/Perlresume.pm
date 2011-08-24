@@ -30,8 +30,6 @@ get '/:author' => sub {
         return template 'not_found';
     }
 
-    save_last_search($author);
-
     $author->{dist_count} = fetch_dist_count($id);
 
     $author->{email} = $author->{email}->[0] if defined $author->{email};
