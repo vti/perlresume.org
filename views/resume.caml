@@ -63,6 +63,21 @@
                         {{#github}}
                         <a href="http://github.com/{{id}}"><img src="/images/profile/github.png" /></a>
                         {{/github}}
+                        {{#coderwall}}
+                        <a href="http://coderwall.com/{{id}}"><img src="/images/profile/coderwall.png" /></a>
+                        {{/coderwall}}
+                        {{#github-meets-cpan}}
+                        <a href="http://github-meets-cpan.com/user/{{id}}"><img src="/images/profile/github-meets-cpan.png" /></a>
+                        {{/github-meets-cpan}}
+                        {{#perlmonks}}
+                        <a href="http://perlmonks.com/?node={{id}}"><img src="/images/profile/perlmonks.png" /></a>
+                        {{/perlmonks}}
+                        {{#stackoverflow}}
+                        <a href="http://stackoverflow.com/users/{{id}}/"><img src="/images/profile/stackoverflow.png" /></a>
+                        {{/stackoverflow}}
+                        {{#linkedin}}
+                        <a href="http://www.linkedin.com/profile/view?id={{id}}"><img src="/images/profile/linkedin.png" /></a>
+                        {{/linkedin}}
                     {{/contacts}}
                     </dd>
                     {{/profiles}}
