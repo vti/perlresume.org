@@ -16,17 +16,6 @@ get '/' => sub {
     }
 
     my $authors;
-    if (-e path('searches')) {
-        open my $fh, '<', path('searches') or die $!;
-        while (defined(my $line = <$fh>)) {
-            chomp $line;
-            my ($id, $name) = split ':' => $line;
-            push @$authors, {id => $id, name => $name};
-        }
-        close $fh;
-
-        $authors = [reverse @$authors];
-    }
 
     template 'index' => {authors => $authors};
 };
@@ -41,11 +30,7 @@ get '/:author' => sub {
         return template 'not_found';
     }
 
-    my $name = $author->{asciiname} ? $author->{asciiname} : $author->{name};
-
-    open my $fh, '>>', path('searches');
-    print $fh "$id:$name", "\n" or die $!;
-    close $fh;
+    save_last_search($author);
 
     $author->{dist_count} = fetch_dist_count($id);
 
@@ -198,4 +183,34 @@ sub fetch_dists_users_count {
     $res = JSON::decode_json($response->decoded_content);
 
     return $res->{hits}->{total};
+}
+
+sub save_last_search {
+    my ($author) = @_;
+
+    my $name = $author->{asciiname} ? $author->{asciiname} : $author->{name};
+
+    open my $fh, '>>', path('searches');
+    print $fh "$author->{pauseid}:$name", "\n" or die $!;
+    close $fh;
+}
+
+sub load_last_searches {
+    my $authors = [];
+    if (-e path('searches')) {
+        open my $fh, '<', path('searches') or die $!;
+        while (defined(my $line = <$fh>)) {
+            chomp $line;
+            my ($id, $name) = split ':' => $line;
+            push @$authors, {id => $id, name => $name};
+        }
+        close $fh;
+
+        $authors = [reverse @$authors];
+        if (@$authors > 10) {
+            $authors = [@$authors[0 .. 10]];
+        }
+    }
+
+    return $authors;
 }
