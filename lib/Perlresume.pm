@@ -150,6 +150,8 @@ sub fetch_dists_users_count {
         push @modules, $name;
     }
 
+    return 0 unless @modules;
+
     $response = $ua->post(
         "$METACPAN/release/_search",
         Content => JSON::encode_json {
