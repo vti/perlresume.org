@@ -1,0 +1,7 @@
+appname: "Perlresume"
+
+layout: "main"
+
+charset: "UTF-8"
+
+template: "caml"

@@ -1,0 +1,19 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset={{settings.charset}}" />
+        <title>Perlresume</title>
+        <link rel="stylesheet" href="{{request.uri_base}}/css/style.css" />
+    </head>
+    <body>
+        <div id="main">
+            <div id="container">
+                {{&content}}
+            </div>
+            <div id="footer">
+                Written by <a href="http://showmetheco.de">vti</a> | Powered by <a href="http://perldancer.org/">Dancer</a> and <a href="http://metacpan.org">MetaCPAN</a>
+            </div>
+        </div>
+    </body>
+</html>

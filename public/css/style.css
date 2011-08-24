@@ -1,0 +1,84 @@
+#main {
+    width:740px;
+    margin:0px auto;
+    padding:2em;
+}
+
+#container {
+}
+
+#footer {
+    border-top:1px solid #ccc;
+    font-size:small;
+    margin-top:2em;
+    padding-top:2em;
+    color:#777;
+}
+
+#resume-banner {
+    padding-top:2em;
+    border-top: 5px solid #ccc;
+}
+
+h1#name {
+    padding-top:0px;
+    margin-top:0px;
+    margin-bottom:0px;
+}
+
+h2#asciiname {
+    padding-top:0px;
+    margin-top:0px;
+    margin-bottom:0px;
+    color:#777;
+}
+
+h3#proud {
+    font-style:italic;
+}
+
+#resume tr {
+    background:#eee;
+}
+
+#resume td {
+    padding:1em;
+    vertical-align:top;
+}
+
+#resume td.title {
+    font-style:italic;
+}
+
+dl {
+    padding:0px;
+    margin:0px;
+}
+
+dt {
+    font-style:italic;
+}
+
+dd {
+    margin-bottom:1em;
+}
+
+#name {
+    padding-top:0px;
+}
+
+#asciiname {
+}
+
+#resume-image {
+    float:left;
+}
+
+.comment {
+    font-size:small;
+    color:#777;
+}
+
+.clear {
+    clear:both;
+}

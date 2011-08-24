@@ -1,0 +1,15 @@
+<h1>My Perl Résumé</h1>
+
+<p>
+Your Perl Résumé generated automatically based on your <a
+    href="http://cpan.org">CPAN</a> experience, activity and impact.
+</p>
+
+<form>
+    <input name="author">
+    <input type="submit" value="Generate" />
+</form>
+
+<h2>See some popular authors</h2>
+
+<h2>Notes</h2>
