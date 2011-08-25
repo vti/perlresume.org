@@ -44,11 +44,32 @@ All the data is fetched from the awesome <a
 
 <script>
     $(document).ready(function() {
+        if ($.cookie('comments')) {
+            showComments();
+        }
+
         $('#showcomments').click(function() {
+            $.cookie('comments', 'yes');
+
+            showComments();
+
+            return false;
+        });
+
+        $('#hidecomments').click(function() {
+            $.cookie('comments', null);
+
+            hideComments();
+
+            return false;
+        });
+
+        function showComments() {
             $('#showcomments').hide();
 
             $('#comments').append(
-    '<h2>Comments</h2>'
+      '<a id="hidecomments" href="/">Hide comments</a>'
+    + '<h2>Comments</h2>'
     + '<div id="disqus_thread"></div>'
     + '<script type="text/javascript">'
     + "    var disqus_shortname = 'perlresume';"
@@ -63,8 +84,12 @@ All the data is fetched from the awesome <a
     + '<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>'
     + '<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>'
             );
+        }
 
-            return false;
-        });
+        function hideComments() {
+            $('#showcomments').show();
+
+            $('#comments').html('');
+        }
     });
 </script>
