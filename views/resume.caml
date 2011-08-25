@@ -76,7 +76,7 @@
                         <a href="http://stackoverflow.com/users/{{id}}/"><img src="/images/profile/stackoverflow.png" /></a>
                         {{/stackoverflow}}
                         {{#linkedin}}
-                        <a href="http://www.linkedin.com/profile/view?id={{id}}"><img src="/images/profile/linkedin.png" /></a>
+                        <a href="http://www.linkedin.com/in/{{id}}"><img src="/images/profile/linkedin.png" /></a>
                         {{/linkedin}}
                     {{/contacts}}
                     </dd>
