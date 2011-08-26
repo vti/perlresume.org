@@ -1,6 +1,7 @@
+{{#has_github_account}}
 <script>
     $(document).ready(function() {
-        var user = gh.user('vti');
+        var user = gh.user('{{id}}');
         user.show(function(data) {
             var repo_count = data.user.public_repo_count;
             var repo_count_label = repo_count > 1 ?  'repositories' : 'repository';
@@ -14,6 +15,7 @@
         });
     });
 </script>
+{{/has_github_account}}
 
 <div id="resume-banner">
 </div>
