@@ -38,7 +38,7 @@ get '/:author' => sub {
         ? $cpan_profile->{asciiname}
         : $cpan_profile->{name},
         %$cpan_profile,
-        %$author
+        views => $author->{views}
     };
 };
 
