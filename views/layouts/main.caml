@@ -11,6 +11,7 @@
         !window.jQuery && document.write('<script type="text/javascript" src="/javascripts/jquery.js"><\/script>')
         /* ]]> */</script>
         <script src="/javascripts/jquery.cookie.js" type="text/javascript"></script>
+        <script src="/javascripts/github.js" type="text/javascript"></script>
     </head>
     <body>
         <div id="main">

@@ -45,6 +45,10 @@ sub fetch_author {
           { $profile->{name} => 1,
             id               => $profile->{id}
           };
+
+        if ($profile->{name} eq 'github') {
+            $author->{has_github_account} = {id => $profile->{id}};
+        }
     }
 
     $author->{profiles} = 1 if @{$author->{contacts}};

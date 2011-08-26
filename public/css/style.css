@@ -21,6 +21,10 @@
     border-top: 5px solid #ccc;
 }
 
+p {
+    margin-top:0px;
+}
+
 h1#name {
     padding-top:0px;
     margin-top:0px;

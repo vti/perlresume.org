@@ -1,3 +1,20 @@
+<script>
+    $(document).ready(function() {
+        var user = gh.user('vti');
+        user.show(function(data) {
+            var repo_count = data.user.public_repo_count;
+            var repo_count_label = repo_count > 1 ?  'repositories' : 'repository';
+            $('#github_repo_count').html(repo_count);
+            $('#github_repo_count_label').html(repo_count_label);
+
+            var followers_count = data.user.followers_count;
+            var followers_count_label = followers_count > 1 ?  'followers' : 'follower';
+            $('#github_followers_count').html(followers_count);
+            $('#github_followers_count_label').html(followers_count_label);
+        });
+    });
+</script>
+
 <div id="resume-banner">
 </div>
 
@@ -23,16 +40,30 @@
                 {{city}}{{/city}} with <a
                     href="http://metacpan.org/author/{{pauseid}}">{{dist_count}}</a>
                 distributions currently on CPAN{{#first_release_year}} since
-                {{first_release_year}}{{/first_release_year}}. {{#website}}I run
-                a website <a href="{{website}}">{{website}}</a>.{{/website}}
+                {{first_release_year}}{{/first_release_year}}.
+
+                {{#has_github_account}}
+                <br /><br />
+                I also have a <a href="http://github.com/{{id}}">GitHub account</a> with <a href="http://github.com/{{id}}"><span
+                id="github_repo_count">0</span></a> <span
+                id="github_repo_count_label">repositories</span>.
+                {{/has_github_account}}
+
+                {{#website}}<br /><br />I run a website <a href="{{website}}">{{website}}</a>.{{/website}}
             </td>
         </tr>
         {{#dists_users_count}}
         <tr>
             <td class="title">Impact</td>
             <td class="description">
-                My modules are used by {{dists_users_count}} other distributions{{#favorited_dist_count}} and
+                My CPAN modules are used by {{dists_users_count}} other distributions{{#favorited_dist_count}} and
                 were favorited {{favorited_dist_count}} times{{/favorited_dist_count}}.
+                {{#has_github_account}}
+                <br /><br />
+                On GitHub I have <a href="http://github.com/{{id}}/followers"><span
+                        id="github_followers_count">0</span></a> <span
+                    id="github_followers_count_label">followers</span>.
+                {{/has_github_account}}
             </td>
         </tr>
         {{/dists_users_count}}
