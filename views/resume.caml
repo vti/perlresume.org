@@ -72,6 +72,16 @@
             <td class="description">
                 <img src="https://metacpan.org/activity?res=month&author={{pauseid}}" />
                 <div><small class="comment">24 month</small></div>
+                {{#latest_release}}
+                    <br />
+                    <dl>
+                        <dt>Latest CPAN release:</dt>
+                        <dd>
+                        <a href="http://metacpan.org/release/{{distribution}}">{{name}}</a>
+                        on {{date}}
+                        </dd>
+                    </dl>
+                {{/latest_release}}
             </td>
         </tr>
         <tr>

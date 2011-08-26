@@ -53,6 +53,10 @@ sub fetch_author {
 
     $author->{profiles} = 1 if @{$author->{contacts}};
 
+    if (my $latest_release = $self->fetch_latest_release($id)) {
+        $author->{latest_release} = $latest_release;
+    }
+
     return $author;
 }
 
@@ -174,6 +178,36 @@ sub fetch_dists_users_count {
     $res = JSON::decode_json($response->decoded_content);
 
     return $res->{hits}->{total};
+}
+
+sub fetch_latest_release {
+    my $self = shift;
+    my ($id) = @_;
+
+    my $mcpan = MetaCPAN::API->new;
+
+    my $result = $mcpan->fetch(
+        'release/_search',
+        q      => "author:$id",
+        filter => 'status:latest',
+        fields => 'distribution,name,date',
+        sort   => 'date:desc',
+        size   => 1
+    );
+
+
+    my $fields = $result->{hits}->{hits}->[0]->{fields};
+
+    my $date = $fields->{date};
+    $date =~ s/\..*$//;
+    $date = Time::Piece->strptime($date, '%Y-%m-%dT%H:%M:%S');
+    $date = $date->strftime('%d %b %Y');
+
+    return {
+        distribution => $fields->{distribution},
+        name         => $fields->{name},
+        date         => $date
+    };
 }
 
 1;
