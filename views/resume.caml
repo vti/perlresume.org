@@ -2,6 +2,8 @@
 </div>
 
 <div id="resume">
+    <div id="views">Views: {{views}}</div>
+
     <table cellspacing="0" cellpadding="0">
         <tr>
             <td class="title"><img src="{{gravatar_url}}" /></td>

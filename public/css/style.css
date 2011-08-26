@@ -88,3 +88,8 @@ dd {
 .clear {
     clear:both;
 }
+
+#views {
+    float:right;
+    font-size:small;
+}

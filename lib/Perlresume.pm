@@ -1,21 +1,18 @@
 package Perlresume;
 use Dancer ':syntax';
-use MetaCPAN::API;
-use Try::Tiny;
-use Time::Piece;
-use LWP::UserAgent;
-use JSON ();
+use Dancer::Plugin::Database;
+use Perlresume::MetaCPAN;
 
 our $VERSION = '0.1';
 
-my $METACPAN = 'http://api.metacpan.org/v0';
+my $mcpan = Perlresume::MetaCPAN->new;
 
 get '/' => sub {
     if (my $author = params->{author}) {
         return redirect '/' . $author;
     }
 
-    my $authors;
+    my $authors = load_last_searches();
 
     template 'index' => {authors => $authors};
 };
@@ -23,192 +20,63 @@ get '/' => sub {
 get '/:author' => sub {
     my $id = uc params->{author};
 
-    my $author = fetch_author($id);
+    my $cpan_profile = $mcpan->fetch_author($id);
 
-    if (!$author) {
+    if (!$cpan_profile) {
         status 'not_found';
         return template 'not_found';
     }
 
-    $author->{dist_count} = fetch_dist_count($id);
-
-    $author->{email} = $author->{email}->[0] if defined $author->{email};
-    $author->{website} = $author->{website}->[0] if defined $author->{website};
-
-    $author->{contacts} = [];
-    foreach my $profile (@{$author->{profile}}) {
-        push @{$author->{contacts}},
-          { $profile->{name} => 1,
-            id               => $profile->{id}
-          };
-    }
-
-    $author->{profiles} = 1 if @{$author->{contacts}};
-
-    $author->{first_release_year} = fetch_first_release_year($id);
-    $author->{favorited_dist_count} = fetch_favorited_dist_count($id);
-
-    $author->{dists_users_count} = fetch_dists_users_count($id);
+    my $author = find_or_create($cpan_profile);
+    $author->{updated} = time;
+    $author->{views}++;
+    my $views = $author->{views};
+    update_author($author);
 
     template 'resume' => {
-        %$author,
-        title => $author->{asciiname} ? $author->{asciiname} : $author->{name}
+        title => $cpan_profile->{asciiname}
+        ? $cpan_profile->{asciiname}
+        : $cpan_profile->{name},
+        %$cpan_profile,
+        %$author
     };
 };
 
 true;
 
-sub fetch_author {
-    my ($id) = @_;
-
-    my $mcpan  = MetaCPAN::API->new;
-
-    return try { $mcpan->author($id) };
-}
-
-sub fetch_dist_count {
-    my ($id) = @_;
-
-    my $mcpan = MetaCPAN::API->new;
-
-    my $result = $mcpan->fetch(
-        'release/_search',
-        q    => "author:$id AND status:latest",
-        size => 0
-    );
-
-    return $result->{hits}->{total};
-}
-
-sub fetch_favorited_dist_count {
-    my ($id) = @_;
-
-    my $mcpan = MetaCPAN::API->new;
-
-    my $result = $mcpan->fetch(
-        'favorite/_search',
-        q    => "author:$id",
-        size => 0
-    );
-
-    return $result->{hits}->{total};
-}
-
-sub fetch_first_release_year {
-    my ($id) = @_;
-
-    my $mcpan = MetaCPAN::API->new;
-
-    my $result = $mcpan->fetch(
-        'release/_search',
-        q    => "author:$id",
-        sort => 'date',
-        size => 1
-    );
-
-    my $date = $result->{hits}->{hits}->[0]->{_source}->{date};
-    return 0 unless defined $date;
-
-    $date = Time::Piece->strptime($date, '%Y-%m-%dT%H:%M:%S');
-
-    return $date->year;
-}
-
-sub fetch_dists_users_count {
-    my ($id) = @_;
-
-    my $ua = LWP::UserAgent->new;
-
-    my $response = $ua->post(
-        "$METACPAN/release/_search",
-        Content => JSON::encode_json(
-            {   query => {
-                    filtered => {
-                        query  => {"match_all" => {}},
-                        filter => {
-                            and => [
-                                {term => {'release.status'     => 'latest'}},
-                                {term => {'release.authorized' => \1}},
-                                {term => {"release.author"     => $id}}
-                            ]
-                        }
-                    }
-                },
-                fields => ['distribution'],
-                size => 999,
-                from => 0,
-                sort => [{date => 'desc'}],
-            }
-        )
-    );
-    die $response->status_line unless $response->is_success;
-
-    my $res = JSON::decode_json($response->decoded_content);
-
-    my @modules;
-    foreach my $module (@{$res->{hits}{hits}}) {
-        my $name = $module->{fields}{distribution};
-        $name =~ s/-/::/g;
-        push @modules, $name;
-    }
-
-    return 0 unless @modules;
-
-    $response = $ua->post(
-        "$METACPAN/release/_search",
-        Content => JSON::encode_json {
-            query => {
-                filtered => {
-                    query  => {"match_all" => {}},
-                    filter => {
-                        and => [
-                            {term => {'release.status'     => 'latest'}},
-                            {term => {'release.authorized' => \1}},
-                            {   terms =>
-                                  {"release.dependency.module" => \@modules}
-                            }
-                        ]
-                    }
-                }
-            },
-            size => 0,
-            #,from => 0
-        }
-    );
-
-    die $response->status_line unless $response->is_success;
-
-    $res = JSON::decode_json($response->decoded_content);
-
-    return $res->{hits}->{total};
-}
-
-sub save_last_search {
+sub find_or_create {
     my ($author) = @_;
+
+    if (my $author =
+        database->quick_select('resume', {pauseid => $author->{pauseid}}))
+    {
+        return $author;
+    }
 
     my $name = $author->{asciiname} ? $author->{asciiname} : $author->{name};
 
-    open my $fh, '>>', path('searches');
-    print $fh "$author->{pauseid}:$name", "\n" or die $!;
-    close $fh;
+    database->quick_insert('resume',
+        {pauseid => $author->{pauseid}, name => $name, updated => time});
+
+    return {pauseid => $author->{pauseid}, views => 0};
+}
+
+sub update_author {
+    my ($author) = @_;
+
+    database->quick_update('resume', {pauseid => $author->{pauseid}},
+        $author);
 }
 
 sub load_last_searches {
-    my $authors = [];
-    if (-e path('searches')) {
-        open my $fh, '<', path('searches') or die $!;
-        while (defined(my $line = <$fh>)) {
-            chomp $line;
-            my ($id, $name) = split ':' => $line;
-            push @$authors, {id => $id, name => $name};
-        }
-        close $fh;
+    my $sth = database->prepare(
+        'SELECT pauseid, name FROM resume ORDER BY updated DESC LIMIT 10',
+    );
+    $sth->execute;
 
-        $authors = [reverse @$authors];
-        if (@$authors > 10) {
-            $authors = [@$authors[0 .. 10]];
-        }
-    }
+    my $authors =
+      [map { {pauseid => $_->[0], name => $_->[1]} }
+          @{$sth->fetchall_arrayref}];
 
     return $authors;
 }
