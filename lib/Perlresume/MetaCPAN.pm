@@ -91,7 +91,8 @@ sub fetch_first_release_year {
     my $date = $result->{hits}->{hits}->[0]->{_source}->{date};
     return 0 unless defined $date;
 
-    $date = Time::Piece->strptime($date, '%Y-%m-%dT%H:%M:%S');
+    $date = try { Time::Piece->strptime($date, '%Y-%m-%dT%H:%M:%S') };
+    return 0 unless defined $date;
 
     return $date->year;
 }
@@ -195,12 +196,14 @@ sub fetch_latest_release {
         size   => 1
     );
 
-
     my $fields = $result->{hits}->{hits}->[0]->{fields};
 
     my $date = $fields->{date};
+    return unless defined $date;
+
     $date =~ s/\..*$//;
-    $date = Time::Piece->strptime($date, '%Y-%m-%dT%H:%M:%S');
+    $date = try { Time::Piece->strptime($date, '%Y-%m-%dT%H:%M:%S') };
+    return unless defined $date;
     $date = $date->strftime('%d %b %Y');
 
     return {
