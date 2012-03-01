@@ -44,6 +44,11 @@
                 distributions currently on CPAN{{#first_release_year}} since
                 {{first_release_year}}{{/first_release_year}}.
 
+                {{#kwalitee_rank}}I am #<a
+                href="http://cpants.charsbar.org/author/{{pauseid}}">{{kwalitee_rank}}</a>
+                in CPANTS rating ({{kwalitee_average}}%&nbsp;average
+                kwalitee).{{/kwalitee_rank}}
+
                 {{#has_github_account}}
                 <br /><br />
                 I also have a <a href="http://github.com/{{id}}">GitHub account</a> with <a href="http://github.com/{{id}}"><span
@@ -60,12 +65,6 @@
             <td class="description">
                 My CPAN modules are used by {{dists_users_count}} other distributions{{#favorited_dist_count}} and
                 were favorited {{favorited_dist_count}} times{{/favorited_dist_count}}.
-
-                {{#kwalitee}}I am
-                #<a
-                href="http://cpants.charsbar.org/author/{{pauseid}}">{{rank}}</a>
-                in CPANTS rating ({{average_kwalitee}}%&nbsp;average
-                kwalitee).{{/kwalitee}}
 
                 {{#has_github_account}}
                 <br /><br />

@@ -32,8 +32,8 @@ WHERE `pauseid` = ?
     return {} unless $result && @$result;
 
     return {
-        average_kwalitee => $result->[0]->[0],
-        rank             => $result->[0]->[1]
+        kwalitee_average => $result->[0]->[0],
+        kwalitee_rank    => $result->[0]->[1]
     };
 }
 

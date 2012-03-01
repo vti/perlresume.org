@@ -42,7 +42,7 @@ get '/:author' => sub {
         ? $cpan_profile->{asciiname}
         : $cpan_profile->{name},
         %$cpan_profile,
-        kwalitee => $kwalitee_profile,
+        %$kwalitee_profile,
         views => $author->{views}
     };
 };
