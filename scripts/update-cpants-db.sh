@@ -1,0 +1,13 @@
+#!/bin/sh
+
+SOURCE='http://cpants.charsbar.org/static/cpants_all.db.gz'
+ROOT=$1
+ORIG_FILE=$ROOT/cpants_all.db
+NEW_FILE=$ROOT/cpants_all.db.1
+
+curl -s $SOURCE | gunzip - > $NEW_FILE
+
+cmp -s $ORIG_FILE $NEW_FILE > /dev/null
+if [ $? -eq 1 ]; then
+    mv $NEW_FILE $ORIG_FILE
+fi
