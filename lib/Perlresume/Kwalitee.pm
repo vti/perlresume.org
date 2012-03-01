@@ -21,7 +21,8 @@ sub fetch_author {
 SELECT
     average_kwalitee,
     rank,
-    average_total_kwalitee
+    average_total_kwalitee,
+    num_dists
 FROM `author`
 WHERE `pauseid` = ?
 
@@ -32,8 +33,11 @@ WHERE `pauseid` = ?
     return {} unless $result && @$result;
 
     return {
-        kwalitee_average => $result->[0]->[0],
-        kwalitee_rank    => $result->[0]->[1]
+        kwalitee_average  => $result->[0]->[0],
+        kwalitee_rank     => $result->[0]->[1],
+        kwalitee_liga => $result->[0]->[3] > 5
+        ? 'more than 5 dists liga'
+        : 'less than 5 dists liga'
     };
 }
 

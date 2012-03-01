@@ -46,8 +46,8 @@
 
                 {{#kwalitee_rank}}I am #<a
                 href="http://cpants.charsbar.org/author/{{pauseid}}">{{kwalitee_rank}}</a>
-                in CPANTS rating ({{kwalitee_average}}%&nbsp;average
-                kwalitee).{{/kwalitee_rank}}
+                ({{kwalitee_liga}}) in CPANTS rating
+                ({{kwalitee_average}}%&nbsp;average kwalitee).{{/kwalitee_rank}}
 
                 {{#has_github_account}}
                 <br /><br />
