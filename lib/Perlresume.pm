@@ -2,10 +2,12 @@ package Perlresume;
 use Dancer ':syntax';
 use Dancer::Plugin::Database;
 use Perlresume::MetaCPAN;
+use Perlresume::Kwalitee;
 
 our $VERSION = '0.1';
 
 my $mcpan = Perlresume::MetaCPAN->new;
+my $kwalitee = Perlresume::Kwalitee->new(dbh => database('cpants'));
 
 get '/' => sub {
     if (my $author = params->{author}) {
@@ -33,11 +35,14 @@ get '/:author' => sub {
     my $views = $author->{views};
     update_author($author);
 
+    my $kwalitee_profile = $kwalitee->fetch_author($id);
+
     template 'resume' => {
         title => $cpan_profile->{asciiname}
         ? $cpan_profile->{asciiname}
         : $cpan_profile->{name},
         %$cpan_profile,
+        kwalitee => $kwalitee_profile,
         views => $author->{views}
     };
 };
@@ -48,14 +53,14 @@ sub find_or_create {
     my ($author) = @_;
 
     if (my $author =
-        database->quick_select('resume', {pauseid => $author->{pauseid}}))
+        database('perlresume')->quick_select('resume', {pauseid => $author->{pauseid}}))
     {
         return $author;
     }
 
     my $name = $author->{asciiname} ? $author->{asciiname} : $author->{name};
 
-    database->quick_insert('resume',
+    database('perlresume')->quick_insert('resume',
         {pauseid => $author->{pauseid}, name => $name, updated => time});
 
     return {pauseid => $author->{pauseid}, views => 0};
@@ -64,12 +69,12 @@ sub find_or_create {
 sub update_author {
     my ($author) = @_;
 
-    database->quick_update('resume', {pauseid => $author->{pauseid}},
+    database('perlresume')->quick_update('resume', {pauseid => $author->{pauseid}},
         $author);
 }
 
 sub load_last_searches {
-    my $sth = database->prepare(
+    my $sth = database('perlresume')->prepare(
         'SELECT pauseid, name FROM resume ORDER BY updated DESC LIMIT 10',
     );
     $sth->execute;

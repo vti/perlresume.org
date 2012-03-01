@@ -19,7 +19,7 @@
                 {{&content}}
             </div>
             <div id="footer">
-                Written by <a href="http://showmetheco.de">vti</a> | Powered by <a href="http://perldancer.org/">Dancer</a> and <a href="http://metacpan.org">MetaCPAN</a>
+                Written by <a href="http://showmetheco.de">vti</a> | Powered by <a href="http://perldancer.org/">Dancer</a>, <a href="http://metacpan.org">MetaCPAN</a> and <a href="http://cpants.perl.org">CPANTS</a>
             </div>
         </div>
         <script type="text/javascript">

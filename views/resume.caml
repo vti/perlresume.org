@@ -40,7 +40,7 @@
             <td class="desription">
                 I am a yet another proud Perl programmer {{#city}}based in
                 {{city}}{{/city}} with <a
-                    href="http://metacpan.org/author/{{pauseid}}">{{dist_count}}</a>
+                href="http://metacpan.org/author/{{pauseid}}">{{dist_count}}</a>
                 distributions currently on CPAN{{#first_release_year}} since
                 {{first_release_year}}{{/first_release_year}}.
 
@@ -60,6 +60,13 @@
             <td class="description">
                 My CPAN modules are used by {{dists_users_count}} other distributions{{#favorited_dist_count}} and
                 were favorited {{favorited_dist_count}} times{{/favorited_dist_count}}.
+
+                {{#kwalitee}}I am
+                #<a
+                href="http://cpants.charsbar.org/author/{{pauseid}}">{{rank}}</a>
+                in CPANTS rating ({{average_kwalitee}}%&nbsp;average
+                kwalitee).{{/kwalitee}}
+
                 {{#has_github_account}}
                 <br /><br />
                 On GitHub I have <a href="http://github.com/{{id}}/followers"><span

@@ -12,10 +12,11 @@ WriteMakefile(
         : ()),
     PL_FILES  => {},
     PREREQ_PM => {
-        'Test::More'    => 0,
-        'YAML'          => 0,
-        'Dancer'        => 1.3030,
-        'MetaCPAN::API' => 0
+        'Test::More'               => 0,
+        'YAML'                     => 0,
+        'Dancer'                   => 1.3030,
+        'Dancer::Plugin::Database' => 0,
+        'MetaCPAN::API'            => 0
     },
     dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},
     clean => {FILES    => 'Perlresume-*'},

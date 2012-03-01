@@ -8,5 +8,10 @@ template: "caml"
 
 plugins:
     Database:
-        driver: 'SQLite'
-        database: 'perlresume.db'
+        connections:
+            perlresume:
+                driver: 'SQLite'
+                database: 'perlresume.db'
+            cpants:
+                driver: 'SQLite'
+                database: 'cpants_all.db'
