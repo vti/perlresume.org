@@ -97,3 +97,7 @@ dd {
     float:right;
     font-size:small;
 }
+
+.tooltip {
+    border-bottom:1px dotted;
+}

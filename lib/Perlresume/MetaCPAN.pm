@@ -32,7 +32,8 @@ sub fetch_author {
     $author->{dist_count}           = $self->fetch_dist_count($id);
     $author->{first_release_year}   = $self->fetch_first_release_year($id);
     $author->{favorited_dist_count} = $self->fetch_favorited_dist_count($id);
-    $author->{dists_users_count}    = $self->fetch_dists_users_count($id);
+    ($author->{dists_users_count}, $author->{dists_users}) =
+      $self->fetch_dists_users_count($id);
 
     $author->{email} = $author->{email}->[0]
       if defined $author->{email};
@@ -180,7 +181,7 @@ sub fetch_dists_users_count {
                     }
                 }
             },
-            size => 0
+            size => 999
         }
     );
 
@@ -188,7 +189,15 @@ sub fetch_dists_users_count {
 
     $res = JSON::decode_json($response->decoded_content);
 
-    return $res->{hits}->{total};
+    my @distributions =
+      map { $_->{_source}->{distribution} } @{$res->{hits}->{hits}};
+
+    if (@distributions > 50) {
+        @distributions = splice @distributions, 0, 49;
+        push @distributions, '...';
+    }
+
+    return ($res->{hits}->{total}, join "  ", @distributions);
 }
 
 sub fetch_latest_release {
