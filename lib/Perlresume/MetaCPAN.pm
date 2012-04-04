@@ -164,9 +164,19 @@ sub fetch_dists_users_count {
                             {term => {'release.status'     => 'latest'}},
                             {term => {'release.authorized' => \1}},
                             {   terms =>
-                                  {"release.dependency.module" => \@modules}
+                                  {'release.dependency.module' => \@modules}
+                            },
+                            {   not => {
+                                    filter => {
+                                        and => [
+                                            {   term =>
+                                                  {'release.author' => $id}
+                                            }
+                                        ]
+                                    }
+                                }
                             }
-                        ]
+                        ],
                     }
                 }
             },
