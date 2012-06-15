@@ -2,13 +2,14 @@
 <script>
     $(document).ready(function() {
         var user = gh.user('{{id}}');
-        user.show(function(data) {
-            var repo_count = data.user.public_repo_count;
+        user.get(function(response) {
+            var data = response.data;
+            var repo_count = data.public_repos;
             var repo_count_label = repo_count > 1 ?  'repositories' : 'repository';
             $('#github_repo_count').html(repo_count);
             $('#github_repo_count_label').html(repo_count_label);
 
-            var followers_count = data.user.followers_count;
+            var followers_count = data.followers;
             var followers_count_label = followers_count > 1 ?  'followers' : 'follower';
             $('#github_followers_count').html(followers_count);
             $('#github_followers_count_label').html(followers_count_label);
