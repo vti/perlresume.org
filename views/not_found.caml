@@ -1,1 +1,6 @@
-<h1>Ooooops!</h1>
+<div class="page-header"
+    <h1>Error</h1>
+</div>
+<p>
+    Oooops!
+</p>

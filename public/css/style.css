@@ -103,4 +103,5 @@ dd {
     #resume td.title {text-align:left}
     #resume td.description {padding-left:0.5em}
     tr+tr{margin-top:0px}
+    input[type=submit]{display:block;margin-top:0.5em}
 }

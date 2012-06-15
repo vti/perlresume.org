@@ -7,9 +7,16 @@ Your Perl Résumé is generated automatically based on your <a
     href="http://cpan.org">CPAN</a> experience, activity and impact.
 </p>
 
-<form>
-    PAUSE ID: <input name="author">
-    <input type="submit" value="Generate" />
+<form class="form-horizontal">
+    <fieldset>
+        <div class="control-group">
+            <label class="control-label" for="author">PAUSE ID</label>
+            <div class="controls">
+                <input type="text" name="author" class="input-large">
+                <input type="submit" value="Generate" class="btn" />
+            </div>
+        </div>
+    </fieldset>
 </form>
 
 <h2>See some examples</h2>
