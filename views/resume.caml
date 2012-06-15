@@ -27,7 +27,7 @@
     <table cellspacing="0" cellpadding="0">
         <tr>
             <td class="title"><img src="{{gravatar_url}}" /></td>
-            <td class="description">
+            <td>
                 <h1 id="name">{{name}}</h1>
                 {{#asciiname}}
                 <h2 id="asciiname">({{asciiname}})</h2>
@@ -38,7 +38,7 @@
         </tr>
         <tr>
             <td class="title">Profile</td>
-            <td class="desription">
+            <td class="description">
                 I am a yet another proud Perl programmer {{#city}}based in
                 {{city}}{{/city}} with <a
                 href="http://metacpan.org/author/{{pauseid}}">{{dist_count}}</a>
@@ -59,7 +59,7 @@
                 id="github_repo_count_label">repositories</span>.
                 {{/has_github_account}}
 
-                {{#website}}<br /><br />I run a website <a href="{{website}}">{{website}}</a>.{{/website}}
+                {{#website}}<br /><br />I run a website <a href="{{website}}"><nobr>{{website}}</nobr></a>.{{/website}}
             </td>
         </tr>
         {{#dists_users_count}}
