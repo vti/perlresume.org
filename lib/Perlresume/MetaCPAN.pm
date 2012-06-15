@@ -24,6 +24,8 @@ sub fetch_author {
     my $self = shift;
     my ($id) = @_;
 
+    return unless $id =~ m/^[A-Z]+$/;
+
     my $mcpan = MetaCPAN::API->new;
 
     my $author = try { $mcpan->author($id) };
