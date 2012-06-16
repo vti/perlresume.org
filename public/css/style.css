@@ -1,3 +1,7 @@
+.column {
+    width: 620px;
+    margin:auto;
+}
 #footer {
     text-align:right;
     border-top:1px solid #ccc;
@@ -16,8 +20,8 @@ p {
     margin-top:0px;
 }
 
-h1 {
-    line-height:25px;
+h1,h2 {
+    line-height:30px;
 }
 
 h1#name {
@@ -98,6 +102,7 @@ dd {
 }
 
 @media all and (max-width:640px) {
+    .column{width:100%}
     table,thead,tbody,tfoot,th,td,tr{display:block}
     #resume td {padding-top:1em;padding-right:0px}
     #resume td.title {text-align:left}

@@ -12,7 +12,7 @@ Your Perl Résumé is generated automatically based on your <a
         <div class="control-group">
             <label class="control-label" for="author">PAUSE ID</label>
             <div class="controls">
-                <input type="text" name="author" class="input-large">
+                <input type="text" name="author" class="span3">
                 <input type="submit" value="Generate" class="btn" />
             </div>
         </div>
