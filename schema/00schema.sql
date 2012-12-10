@@ -1,7 +1,7 @@
 PRAGMA foreign_keys=OFF;
 BEGIN TRANSACTION;
 
-DROP TABLE `resume`;
+DROP TABLE IF EXISTS `resume`;
 CREATE TABLE `resume` (
  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
  `pauseid` varchar(40) NOT NULL default '',
