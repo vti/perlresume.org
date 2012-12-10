@@ -33,7 +33,7 @@ Your Perl Résumé is generated automatically based on your <a
             <a href="/MLEHMANN">Marc Lehmann</a><br />
             {{/authors}}
             {{#authors}}
-            <a href="/{{pauseid}}">{{name}}</a><br />
+            <a href="/{{pauseid}}">{{name}} ({{pauseid}})</a><br />
             {{/authors}}
         </td>
     </tr>
