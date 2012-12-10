@@ -9,6 +9,8 @@ our $VERSION = '0.1';
 my $mcpan = Perlresume::MetaCPAN->new;
 my $kwalitee = Perlresume::Kwalitee->new(dbh => database('cpants'));
 
+set 'warnings' => 0;
+
 get '/' => sub {
     if (my $author = params->{author}) {
         return redirect '/' . $author;
