@@ -135,6 +135,19 @@
                     {{/contacts}}
                     </dd>
                     {{/profiles}}
+
+                    {{#profiles}}
+                    {{#contacts}}
+                    {{#coderwall}}
+                        <div id="coderwall_endorse">
+                            <a href="https://coderwall.com/{{id}}">
+                            <img alt="Endorse {{name}} on Coderwall"
+                                width="110" height="20"
+                                src="http://api.coderwall.com/{{id}}/endorsecount.png" /></a>
+                        </div>
+                    {{/coderwall}}
+                    {{/contacts}}
+                    {{/profiles}}
             </td>
         </tr>
         <tr>
