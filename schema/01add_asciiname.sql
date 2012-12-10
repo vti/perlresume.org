@@ -1,0 +1,1 @@
+ALTER TABLE `resume` ADD COLUMN `asciiname` VARCHAR(255) NOT NULL DEFAULT '';

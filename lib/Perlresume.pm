@@ -60,10 +60,19 @@ sub find_or_create {
         return $author;
     }
 
-    my $name = $author->{asciiname} ? $author->{asciiname} : $author->{name};
+    my $name = $author->{name} ? $author->{name} : $author->{asciiname};
+    my $asciiname =
+      $author->{asciiname} ? $author->{asciiname} : $author->{name};
 
-    database('perlresume')->quick_insert('resume',
-        {pauseid => $author->{pauseid}, name => $name, updated => time});
+    database('perlresume')->quick_insert(
+        'resume',
+        {
+            pauseid   => $author->{pauseid},
+            asciiname => $asciiname,
+            name      => $name,
+            updated   => time
+        }
+    );
 
     return {pauseid => $author->{pauseid}, views => 0};
 }
