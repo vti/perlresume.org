@@ -52,29 +52,51 @@ get '/:author' => sub {
 true;
 
 sub find_or_create {
-    my ($author) = @_;
+    my ($cpan_author) = @_;
 
     if (my $author =
-        database('perlresume')->quick_select('resume', {pauseid => $author->{pauseid}}))
+        database('perlresume')->quick_select('resume', {pauseid => $cpan_author->{pauseid}}))
     {
+
+        # TODO: remove me when everything is updated
+        if (!$author->{asciiname}) {
+            my $name =
+                $cpan_author->{name}
+              ? $cpan_author->{name}
+              : $cpan_author->{asciiname};
+            my $asciiname =
+                $cpan_author->{asciiname}
+              ? $cpan_author->{asciiname}
+              : $cpan_author->{name};
+            $author->{name}      = $name;
+            $author->{asciiname} = $asciiname;
+
+            database('perlresume')
+              ->quick_update( 'resume', { pauseid => $author->{pauseid} },
+                $author );
+        }
+
         return $author;
     }
 
-    my $name = $author->{name} ? $author->{name} : $author->{asciiname};
+    my $name =
+      $cpan_author->{name} ? $cpan_author->{name} : $cpan_author->{asciiname};
     my $asciiname =
-      $author->{asciiname} ? $author->{asciiname} : $author->{name};
+        $cpan_author->{asciiname}
+      ? $cpan_author->{asciiname}
+      : $cpan_author->{name};
 
     database('perlresume')->quick_insert(
         'resume',
         {
-            pauseid   => $author->{pauseid},
+            pauseid   => $cpan_author->{pauseid},
             asciiname => $asciiname,
             name      => $name,
             updated   => time
         }
     );
 
-    return {pauseid => $author->{pauseid}, views => 0};
+    return {pauseid => $cpan_author->{pauseid}, views => 0};
 }
 
 sub update_author {
