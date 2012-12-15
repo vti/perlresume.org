@@ -4,9 +4,9 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME         => 'Perlresume',
-    AUTHOR       => q{YOUR NAME <youremail@example.com>},
+    AUTHOR       => q{Viacheslav Tykhanovskyi <vti@cpan.org>},
     VERSION_FROM => 'lib/Perlresume.pm',
-    ABSTRACT     => 'YOUR APPLICATION ABSTRACT',
+    ABSTRACT     => 'Perl resume',
     ( $ExtUtils::MakeMaker::VERSION >= 6.3002
         ? ( 'LICENSE' => 'perl' )
         : () ),
