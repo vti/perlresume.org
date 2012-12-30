@@ -1,0 +1,19 @@
+This is a source code for http://perlresume.org.
+
+How to install
+
+1. Clone the repository
+
+    git clone http://github.com/vti/perlresume.org
+
+2. Install dependencies
+
+    cpanm --installdeps .
+
+3. Setup SQLite database
+
+    sqlite3 perlresume.db < schema/*.sql
+
+4. Start the embedded server
+
+    plackup bin/app.pl
