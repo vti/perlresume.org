@@ -55,7 +55,7 @@
                 {{#has_github_account}}
                 <br /><br />
                 I also have a <a href="http://github.com/{{id}}">GitHub account</a> with <a href="http://github.com/{{id}}"><span
-                id="github_repo_count">0</span></a> <span
+                id="github_repo_count">an unknown number of</span></a> <span
                 id="github_repo_count_label">repositories</span>.
                 {{/has_github_account}}
 
