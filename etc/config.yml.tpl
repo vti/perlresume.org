@@ -12,6 +12,8 @@ plugins:
             perlresume:
                 driver: 'SQLite'
                 database: '<%= $::base %>/perlresume.db'
+                dbi_params:
+                    sqlite_unicode: 1
             cpants:
                 driver: 'SQLite'
                 database: '<%= $::base %>/cpants_all.db'
