@@ -16,6 +16,7 @@ WriteMakefile(
         'YAML'                     => 0,
         'Dancer'                   => 1.3030,
         'Dancer::Plugin::Database' => 0,
+        'DBD::SQLite' => 0,
         'Dancer::Template::Caml'   => 0,
         'MetaCPAN::API'            => 0,
         'Plack'                    => 0,
