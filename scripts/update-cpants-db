@@ -5,7 +5,7 @@ ROOT=$1
 ORIG_FILE=$ROOT/cpants_all.db
 NEW_FILE=$ROOT/cpants_all.db.1
 
-curl -s $SOURCE | gunzip - > $NEW_FILE
+curl -L -s $SOURCE | gunzip - > $NEW_FILE
 
 cmp -s $ORIG_FILE $NEW_FILE > /dev/null
 if [ $? -eq 1 ]; then
