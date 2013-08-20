@@ -11,7 +11,7 @@ plugins:
         connections:
             perlresume:
                 driver: 'SQLite'
-                database: 'perlresume.db'
+                database: '<%= $::base %>/perlresume.db'
             cpants:
                 driver: 'SQLite'
-                database: 'cpants_all.db'
+                database: '<%= $::base %>/cpants_all.db'
