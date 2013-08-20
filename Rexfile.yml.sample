@@ -1,0 +1,7 @@
+name: perlresume.org
+base: /home/www/perlresume.org
+cpanm: cpanm
+user: www
+port: 22
+uwsgi_listen: 127.0.0.1:8080
+sudo_password: some-password
