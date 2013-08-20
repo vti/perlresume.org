@@ -2,12 +2,12 @@ package Perlresume;
 use Dancer ':syntax';
 use Dancer::Plugin::Database;
 use Perlresume::MetaCPAN;
-use Perlresume::Kwalitee;
+#use Perlresume::Kwalitee;
 
 our $VERSION = '0.1';
 
 my $mcpan = Perlresume::MetaCPAN->new;
-my $kwalitee = Perlresume::Kwalitee->new(dbh => database('cpants'));
+#my $kwalitee = Perlresume::Kwalitee->new(dbh => database('cpants'));
 
 set 'warnings' => 0;
 
@@ -37,14 +37,14 @@ get '/:author' => sub {
     my $views = $author->{views};
     update_author($author);
 
-    my $kwalitee_profile = $kwalitee->fetch_author($id);
+    #my $kwalitee_profile = $kwalitee->fetch_author($id);
 
     template 'resume' => {
         title => $cpan_profile->{asciiname}
         ? $cpan_profile->{asciiname}
         : $cpan_profile->{name},
         %$cpan_profile,
-        %$kwalitee_profile,
+        #%$kwalitee_profile,
         views => $author->{views}
     };
 };
