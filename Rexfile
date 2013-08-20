@@ -1,6 +1,7 @@
 use Term::ReadKey;
 use YAML ();
 use Rex -feature => '0.42';
+use Rex::Transaction;
 
 my $config = YAML::LoadFile('Rexfile.yml');
 
@@ -20,88 +21,123 @@ chomp(my $ls_files = <<'EOF');
     echo $SM $LS
 EOF
 
-sub _get_last_commit {
-    my $last_commit = run 'git log | head -1';
-    my ($sha1) = $last_commit =~ m/commit (.{5})/;
-    return $sha1;
+sub run_or_die {
+    my $output = run @_;
+    die "Command failed: $output" if $?;
 }
 
 set connection => 'OpenSSH';
 
-task 'upload' => sub {
+task 'upload_archive' => sub {
     my $archive;
     LOCAL {
-        my $sha1 = _get_last_commit();
+        my $sha1 = get_last_commit();
 
-        my $prefix = "$config->{app}-$sha1";
+        my $prefix = "app-$sha1";
         $archive = "$prefix.tar.gz";
 
         my @files = run "$ls_files";
-        run "tar --transform 's,^,$prefix/,' -czf $archive @files";
+        run_or_die "tar --transform 's,^,$prefix/,' -czf $archive @files";
     };
 
-    my $base = "$config->{base}/www";
+    my $base = "$config->{base}";
+    mkdir $base;
 
     upload $archive, "$base/";
 
-    run "tar xzf $base/$archive -C $base/";
+    run_or_die "tar xzf $base/$archive -C $base/";
     die 'tar failed' if $?;
 
     run "rm $base/$archive";
 };
 
+task 'installdeps' => sub {
+    my $sha1 = get_last_commit();
+    my $latest_release = "app-$sha1";
+
+    run_or_die "cd $config->{base}/$latest_release; perl $config->{cpanm} --installdeps -L ../perl5 .";
+};
+
 task 'switch' => sub {
     my $base = $config->{base};
 
-    my $sha1 = _get_last_commit();
+    my $sha1 = get_last_commit();
 
-    my $latest_release = "$config->{app}-$sha1";
+    my $latest_release = "app-$sha1";
 
-    rm "$base/www/$config->{app}";
-    ln "$base/www/$latest_release", "$base/www/$config->{app}";
+    rm "$base/app-current";
+    ln "$base/$latest_release", "$base/app-current";
 };
 
-task 'uwsgi' => sub {
-    file "$config->{base}/uwsgi/$config->{app}.uwsgi.ini",
+task 'start' => sub {
+    sudo_password read_password();
+    sudo sub { run "supervisorctl start $config->{name}" };
+};
+
+task 'restart' => sub {
+    sudo_password read_password();
+    sudo sub { run "supervisorctl restart $config->{name}" };
+};
+
+task 'setup_uwsgi' => sub {
+    mkdir "$config->{base}/uwsgi/";
+    file "$config->{base}/uwsgi/uwsgi.ini",
       content => template(
-        'etc/uwsgi/uwsgi.ini.tpl',
+        'etc/uwsgi.ini.tpl',
         base         => $config->{base},
         uwsgi_listen => $config->{uwsgi_listen}
       );
 };
 
-task 'supervisor' => sub {
-    #sudo_password read_password();
-    #sudo sub {
-    #sub {
-        file "/etc/supervisor/conf.d/$config->{app}.conf",
+task 'setup_nginx' => sub {
+    sudo_password read_password();
+    sudo sub {
+        file "/etc/nginx/sites-available/$config->{name}",
           content => template(
-            "etc/supervisor/$config->{app}.conf.tpl",
+            'etc/nginx.tpl',
+            server_name => $config->{name},
+            access_log  => "$config->{base}/logs/$config->{name}.access.log",
+            error_log   => "$config->{base}/logs/$config->{name}.error.log",
+            root        => "$config->{base}/www/$config->{name}/public",
+            uwsgi_pass  => $config->{uwsgi_listen}
+          );
+        rm "/etc/nginx/sites-enabled/$config->{name}";
+        ln "/etc/nginx/sites-available/$config->{name}", "/etc/nginx/sites-enabled/$config->{name}";
+        run_or_die "/etc/init.d/nginx restart";
+    };
+};
+
+task 'setup_supervisor' => sub {
+    sudo_password read_password();
+    sudo sub {
+        file "/etc/supervisor/conf.d/$config->{name}.conf",
+          content => template(
+            "etc/supervisor.conf.tpl",
             user => $config->{user},
             base => $config->{base}
           );
-
-        run 'supervisorctl reread';
-        #};
-};
-
-task 'start' => sub {
-    sudo_password read_password();
-    sudo sub { run "supervisorctl start $config->{app}" };
-};
-
-task 'restart' => sub {
-    sudo_password read_password();
-    sudo sub { run "supervisorctl restart $config->{app}" };
+    };
 };
 
 task 'setup' => sub {
     transaction {
-        do_task [qw/upload uwsgi supervisor switch/];
+        upload_archive();
+        setup_uwsgi();
+        setup_supervisor();
+        switch();
     };
 };
 
+sub get_last_commit {
+    my $last_commit = `git log | head -1`;
+    my ($sha1) = $last_commit =~ m/commit (.{5})/;
+    die 'cannot get latest commit' unless $sha1;
+    return $sha1;
+}
+
 sub read_password {
+    return $config->{sudo_password} if $config->{sudo_password};
+
     print "Password please: ";
     ReadMode "noecho";    # don't echo anything
     my $password = <STDIN>;
