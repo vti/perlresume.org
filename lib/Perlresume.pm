@@ -11,11 +11,6 @@ my $mcpan = Perlresume::MetaCPAN->new;
 
 set 'warnings' => 0;
 
-#hook 'database_connected' => sub {
-#    my $dbh = shift;
-#    $dbh->{sqlite_unicode} = 1;
-#};
-
 get '/' => sub {
     if (my $author = params->{author}) {
         return redirect '/' . $author;
