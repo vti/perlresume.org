@@ -1,0 +1,19 @@
+appname: "Perlresume"
+
+layout: "main"
+
+charset: "UTF-8"
+
+template: "caml"
+
+plugins:
+    Database:
+        connections:
+            perlresume:
+                driver: 'SQLite'
+                database: '/path/to/perlresume.db'
+                dbi_params:
+                    sqlite_unicode: 1
+            cpants:
+                driver: 'SQLite'
+                database: '/path/to/cpants_all.db'

@@ -14,6 +14,10 @@ How to install
 
     cat schema/*.sql | sqlite3 perlresume.db
 
-4. Start the embedded server
+4. Copy config.yml.sample to config.yml and adjust to your needs.
+
+    cp config.yml.sample config.yml
+
+5. Start the embedded server
 
     plackup bin/app.pl
