@@ -72,7 +72,7 @@
                 {{#has_github_account}}
                 <br /><br />
                 On GitHub I have <a href="http://github.com/{{id}}/followers"><span
-                        id="github_followers_count">0</span></a> <span
+                        id="github_followers_count">an unknown number [please whitelist JavaScript] of</span></a> <span
                     id="github_followers_count_label">followers</span>.
                 {{/has_github_account}}
             </td>
