@@ -26,19 +26,64 @@ sub run_or_die {
     die "Command failed: $output" if $?;
 }
 
+sub file_update_if_needed {
+    my ($file, %options) = @_;
+
+    my $content = $options{content} || cat $options{source};
+
+    if (!is_file($file) || $content ne cat $file) {
+        if (is_file($file)) {
+            Rex::Logger::info("Back up old config");
+            mv $file, $file . ".prev";
+        }
+
+        Rex::Logger::info("Writing configuration file");
+        file $file, content => $content;
+
+        return 1;
+    }
+    else {
+        if (is_file "$file.prev") {
+            Rex::Logger::info("Removing outdated backup");
+
+            rm "$file.prev";
+        }
+
+        Rex::Logger::info("Files are same. Skipping");
+
+        return 0;
+    }
+}
+
+sub file_rollback_if_needed {
+    my ($file) = @_;
+
+    if (!is_file("$file.prev")) {
+        Rex::Logger::info("Nothing to rollback");
+        return 0;
+    }
+
+    mv "$file.prev", $file;
+    return 1;
+}
+
 set connection => 'OpenSSH';
 
 task 'upload_archive' => sub {
-    my $latest_release;
+    my $sha1 = get_last_commit();
+    my $latest_release = "app-$sha1";
+
+    if (is_dir("$config->{base}/$latest_release")) {
+        Rex::Logger::info("Already uploaded");
+        return;
+    }
+
     my $archive;
     LOCAL {
-        my $sha1 = get_last_commit();
-
-        my $prefix = $latest_release = "app-$sha1";
-        $archive = "$prefix.tar.gz";
+        $archive = "$latest_release.tar.gz";
 
         my @files = run "$ls_files";
-        run_or_die "tar --transform 's,^,$prefix/,' -czf $archive @files";
+        run_or_die "tar --transform 's,^,$latest_release/,' -czf $archive @files";
     };
 
     my $base = "$config->{base}";
@@ -68,77 +113,111 @@ task 'switch' => sub {
     my $base = $config->{base};
 
     my $sha1 = get_last_commit();
-
     my $latest_release = "app-$sha1";
 
-    rm "$base/app-current";
-    ln "$base/$latest_release", "$base/app-current";
+    if (readlink("$base/app-current", "$base/$latest_release")) {
+        Rex::Logger::info("Already switched");
+    }
+    else {
+        rm "$base/app-current";
+        ln "$base/$latest_release", "$base/app-current";
+
+        run_or_die "supervisorctl restart $config->{app}";
+    }
+};
+
+task 'uwsgi_rollout' => sub {
+    mkdir "$config->{base}/uwsgi/";
+
+    my $content = template(
+        'etc/uwsgi.ini.tpl',
+        base         => $config->{base},
+        uwsgi_listen => $config->{uwsgi_listen}
+    );
+
+    file_update_if_needed "$config->{base}/uwsgi/uwsgi.ini",
+      content => $content;
+};
+
+task 'uwsgi_rollback' => sub {
+    my $file = "$config->{base}/uwsgi/uwsgi.ini";
+
+    file_rollback_if_needed $file;
+};
+
+task 'nginx_rollout' => sub {
+    my $content = template(
+        'etc/nginx.tpl',
+        server_name => $config->{name},
+        access_log  => "$config->{base}/logs/access.log",
+        error_log   => "$config->{base}/logs/error.log",
+        root        => "$config->{base}/app-current/public",
+        uwsgi_pass  => $config->{uwsgi_listen}
+    );
+
+    my $path_to_config = "/etc/nginx/sites-available/$config->{name}";
+
+    sudo_password read_password();
+    sudo sub {
+        if (file_update_if_needed $path_to_config, content => $content) {
+            service nginx => 'restart';
+        }
+    };
+};
+
+task 'nginx_rollback' => sub {
+    my $path_to_config = "/etc/nginx/sites-available/$config->{name}";
+
+    sudo_password read_password();
+    sudo sub {
+        if (file_rollback_if_needed $path_to_config) {
+            rm "/etc/nginx/sites-enabled/$config->{name}";
+            ln "/etc/nginx/sites-available/$config->{name}",
+              "/etc/nginx/sites-enabled/$config->{name}";
+
+            mkdir "$config->{base}/logs/";
+
+            service nginx => 'restart';
+        }
+    };
+};
+
+task 'supervisor_rollout' => sub {
+    my $path_to_config ="/etc/supervisor/conf.d/$config->{name}.conf";
+
+    my $content = template(
+      "etc/supervisor.conf.tpl",
+      user => $config->{user},
+      base => $config->{base}
+    );
+
+    sudo_password read_password();
+    sudo sub {
+        if (file_update_if_needed $path_to_config, content => $content) {
+            run_or_die 'supervisorctl update';
+        }
+    };
+};
+
+task 'supervisor_rollback' => sub {
+    my $path_to_config = "/etc/supervisor/conf.d/$config->{name}.conf";
+
+    sudo_password read_password();
+    sudo sub {
+        if (file_rollback_if_needed $path_to_config) {
+            run_or_die 'supervisorctl update';
+        }
+    };
 };
 
 task 'rollout' => sub {
     transaction {
         upload_archive();
         installdeps();
+        uwsgi_rollout();
+        nginx_rollout();
         switch();
-        restart();
     };
-};
-
-task 'start' => sub {
-    sudo_password read_password();
-    sudo sub { run "supervisorctl start $config->{name}" };
-};
-
-task 'restart' => sub {
-    sudo_password read_password();
-    sudo sub { run "supervisorctl restart $config->{name}" };
-};
-
-task 'setup_uwsgi' => sub {
-    mkdir "$config->{base}/uwsgi/";
-    file "$config->{base}/uwsgi/uwsgi.ini",
-      content => template(
-        'etc/uwsgi.ini.tpl',
-        base         => $config->{base},
-        uwsgi_listen => $config->{uwsgi_listen}
-      );
-};
-
-task 'setup_nginx' => sub {
-    sudo_password read_password();
-    sudo sub {
-        file "/etc/nginx/sites-available/$config->{name}",
-          content => template(
-            'etc/nginx.tpl',
-            server_name => $config->{name},
-            access_log  => "$config->{base}/logs/access.log",
-            error_log   => "$config->{base}/logs/error.log",
-            root        => "$config->{base}/app-current/public",
-            uwsgi_pass  => $config->{uwsgi_listen}
-          );
-        rm "/etc/nginx/sites-enabled/$config->{name}";
-        ln "/etc/nginx/sites-available/$config->{name}",
-          "/etc/nginx/sites-enabled/$config->{name}";
-        mkdir "$config->{base}/logs/";
-        run_or_die "/etc/init.d/nginx restart";
-    };
-};
-
-task 'setup_supervisor' => sub {
-    sudo_password read_password();
-    sudo sub {
-        file "/etc/supervisor/conf.d/$config->{name}.conf",
-          content => template(
-            "etc/supervisor.conf.tpl",
-            user => $config->{user},
-            base => $config->{base}
-          );
-        run_or_die 'supervisorctl update';
-    };
-};
-
-task 'setup' => sub {
-    transaction {};
 };
 
 sub get_last_commit {

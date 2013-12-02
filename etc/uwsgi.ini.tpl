@@ -9,5 +9,6 @@ max-requests=5000
 socket=<%= $uwsgi_listen %>
 processes=8
 
+
 plugins=psgi
 psgi=<%= $base %>/app-current/bin/app.pl
